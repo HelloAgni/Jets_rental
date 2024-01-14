@@ -23,9 +23,16 @@ class Rental(Base):
         ForeignKey('user.id')
     )
 
-    def __init__(self, start_date: date, end_date: date):
+    def __init__(
+            self, start_date: date,
+            end_date: date,
+            jet_id: int,
+            user_id: int
+            ):
         self.start_date = start_date
         self.end_date = end_date
+        self.jet_id = jet_id
+        self.user_id = user_id
 
     @hybrid_property
     def duration(self):
@@ -37,6 +44,6 @@ class Rental(Base):
 
     def __repr__(self) -> str:
         return (
-            f'Start: {self.start_date}\n'
+            f'Start: {self.start_date} '
             f'End: {self.end_date}'
             )
