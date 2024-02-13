@@ -9,7 +9,8 @@ from sqlalchemy import create_engine, delete, func, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session, settings
-from app.models import Jet
+from app.models import Jet, Rental
+from app.schemas.rental import RentalLoad
 
 router = APIRouter()
 
@@ -19,31 +20,32 @@ router = APIRouter()
 )
 async def check_data(
     session: AsyncSession = Depends(get_async_session),
-    skip: int = Query(ge=0, default=0),
-    size: int = Query(ge=1, le=20)
+    start_from: int = Query(ge=0, default=0),
+    page_size: int = Query(ge=1, le=20, default=5)
 ):
     """
     <b>Check data, pagination available.</b>\n
-    skip - start from row\n
-    size - number of response rows
+    start_from - start from row\n
+    page_size - number of response rows
     """
     all_data = await session.execute(
         select(Jet)
     )
-    result = all_data.scalars().all()[skip: size]
+    result = all_data.scalars().all()[start_from: page_size]
     return result
 
 
 @router.post(
-    '/insert-data-v1',
+    '/insert-data-jet-v1',
 )
-async def insert_data_v1(
+async def insert_data_jet_v1(
     session: AsyncSession = Depends(get_async_session),
     *,
     # csv_file_name: str = 'jets_csv'
     file: UploadFile,
 ):
     """
+    Open file and insert data Jet.
     pandas read csv + session insert.\n
     """
     start = time.time()
@@ -59,11 +61,53 @@ async def insert_data_v1(
     await session.commit()
     end = time.time()
     print(end - start)
-    return {'Time-v2': end - start}
+    return {
+        'Result': 'Successful!',
+        'Time-v2': round(end - start, 5)}
 
 
 @router.post(
-    '/insert-data-v2'
+    '/insert-data-rental-v1',
+    # deprecated=True
+)
+async def insert_data_rental_v1(
+    session: AsyncSession = Depends(get_async_session),
+    *,
+    file: UploadFile,
+
+    # csv_file_name: str = 'jets_csv'
+):
+    """
+    Open file and insert data Rental.\n
+    pandas read csv + session insert.\n
+    """
+    start = time.time()
+    # current_dir = pathlib.Path(__file__).parent / (csv_file_name + '.csv')
+    # data_to_insert = pd.read_csv(current_dir).to_dict(orient='records')
+
+    data_to_insert: list[dict] = pd.read_csv(
+        file.file).to_dict(orient='records')
+
+    # Custom fix for insert to PostgreSQL DATE column
+    # convert str(date) from csv file to datetime.date()
+    # 2024-02-15 => datetime.date(2024, 2, 15)
+    await session.execute(
+        insert(Rental),
+        [RentalLoad(**row).model_dump() for row in data_to_insert]
+    )
+
+    await session.commit()
+
+    end = time.time()
+    print(end - start)
+    return {
+        'Result': 'Successful!',
+        'Time-v2': round(end - start, 5)}
+
+
+@router.post(
+    '/insert-data-v2',
+    deprecated=True
 )
 async def insert_data_v2(
     session: AsyncSession = Depends(get_async_session),
@@ -91,7 +135,8 @@ async def insert_data_v2(
 
 
 @router.post(
-    '/insert-data-v3'
+    '/insert-data-v3',
+    deprecated=True,
 )
 def insert_data_v3():
     """
@@ -117,7 +162,8 @@ def insert_data_v3():
 
 
 @router.post(
-    '/create-csv'
+    '/create-csv',
+    deprecated=True
 )
 def create_csv(
     rows: int = 10,
@@ -139,26 +185,31 @@ def create_csv(
     df.to_csv(current_dir, sep=',', index=False)
     end = time.time()
     print(end - start)
-    return {'csv created with rows:': rows}
+    return {'CSV created, number of rows: ': rows}
 
 
 @router.delete(
     '/delete-my-data'
 )
-async def delete_jets(
+async def delete_jets_and_rental(
     session: AsyncSession = Depends(get_async_session)
 ):
     """
+    Delete all rows from Rental table.\n
     Delete all rows from Jet table.
     """
     count_jets = select(func.count()).select_from(Jet)
-    z = await session.execute(count_jets)
-    # print(z.scalar())
-    # 8999
+    count_rentals = select(func.count()).select_from(Rental)
+    jets = await session.execute(count_jets)
+    rentals = await session.execute(count_rentals)
 
-    # sss = delete(Jet).where(Jet.id == 1)
-    # sss = delete(Jet).where(Jet.id.in_([11, 12, 13]))
+    delete_rentals = delete(Rental)
     delete_jets = delete(Jet)
+
+    await session.execute(delete_rentals)
     await session.execute(delete_jets)
     await session.commit()
-    return {'Deleted:': z.scalar()}
+    return {'Deleted:': [
+            {Jet.__tablename__: jets.scalar()},
+            {Rental.__tablename__: rentals.scalar()}]
+            }

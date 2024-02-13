@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+# from fastapi.responses import RedirectResponse
 from app.core.config import settings
 from app.api.routers import main_router
 from app.data._data_ import router as data_router
@@ -34,7 +35,10 @@ app = FastAPI(
 
 @app.get('/', tags=['Home'])
 def hello():
-    return {'Hello': 'User!'}
+    return {
+        'Hello': 'User!',
+        'Docs': 'http://127.0.0.1:8000/docs'
+        }
 
 
 app.include_router(main_router)

@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.validators import (check_rental_before_edit,
-                                check_rental_intersections,
-                                check_jet_exists)
+from app.api.validators import (check_jet_exists, check_rental_before_edit,
+                                check_rental_intersections)
 from app.core.db import get_async_session
 from app.core.user import current_superuser, current_user
 from app.crud.rental import rental_crud
-from app.models import User
-from app.schemas.rental import RentalCreate, RentalDB, RentalUpdate
+from app.models import Jet, Rental, User
+from app.schemas.rental import R1, R2, R3, RentalCreate, RentalDB, RentalUpdate
 
 router = APIRouter()
 
@@ -41,6 +41,8 @@ async def create_rental(
     '/',
     response_model=list[RentalDB],
     dependencies=[Depends(current_superuser)],
+    #
+    response_model_exclude_none=True,
 )
 async def get_all_rentals(
     session: AsyncSession = Depends(get_async_session)
@@ -50,6 +52,7 @@ async def get_all_rentals(
     Only available to super users.
     """
     rentals = await rental_crud.get_multi(session)
+    print(rentals)
     return rentals
 
 
@@ -117,7 +120,6 @@ async def update_rental(
     )
     await check_rental_intersections(
         **obj_in.model_dump(),
-        # id обновляемого объекта бронирования,
         rental_id=rental_id,
         jet_id=rental.jet_id,
         session=session
@@ -129,3 +131,91 @@ async def update_rental(
         session=session
     )
     return rental
+
+
+@router.get(
+        '/rental-user-info',
+        response_model=list[R3],
+        response_model_exclude_none=True
+)
+async def rental_user_info(
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_user)
+):
+    """
+    Check all rentals by current user.
+    """
+    duration = (func.date_part('day', Rental.end_date) -
+                func.date_part('day', Rental.start_date))
+    total_price = duration * Jet.price
+    result = await session.execute(select(
+        Rental.id.label('rental_id'),
+        Rental.jet_id,
+        Rental.start_date,
+        Rental.end_date,
+        Rental.user_id,
+        User.email.label('user_email'),  # type: ignore
+        Jet.name.label('jet_name'),
+        Jet.price,
+        duration.label('duration'),
+        total_price.label('total_price')
+        ).join(Jet, Rental.jet_id == Jet.id
+               ).where(Rental.user_id == user.id
+                       ).join(User, Rental.user_id == User.id))  # type: ignore
+    return [elem._asdict() for elem in result]
+
+
+@router.get(
+        '/rental-info-1',
+        response_model=list[R1],
+        response_model_exclude_none=True
+)
+async def rental_info_v1(
+    session: AsyncSession = Depends(get_async_session)
+
+):
+    """
+    Rental days duration v1.
+    Available for all users.
+    """
+    duration = (func.date_part('day', Rental.end_date) -
+                func.date_part('day', Rental.start_date))
+    total_price = duration * Jet.price
+    result = await session.execute(select(
+        Rental.id.label('rental_id'),
+        Rental.jet_id,
+        Rental.start_date,
+        Rental.end_date,
+        Jet.name.label('jet_name'),
+        Jet.price,
+        duration.label('duration'),
+        total_price.label('total_price')
+        ).join(Jet, Rental.jet_id == Jet.id))
+    return [elem._asdict() for elem in result]
+
+
+@router.get(
+        '/rental-info-2',
+        response_model=list[R2],
+        response_model_exclude_none=True
+)
+async def rental_info_v2(
+    session: AsyncSession = Depends(get_async_session)
+
+):
+    """
+    Rental days duration v2.
+    Available for all users.
+    """
+    duration = (func.date_part('day', Rental.end_date) -
+                func.date_part('day', Rental.start_date))
+    total_price = duration * Jet.price
+    q = await session.execute(select(
+        Rental,
+        Jet.name,
+        Jet.price,
+        duration.label('duration'),
+        total_price.label('total_price')
+        ).join(Jet, Rental.jet_id == Jet.id))
+    new = [a._asdict() for a in q]
+    return new

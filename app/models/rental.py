@@ -3,7 +3,6 @@ from datetime import date
 from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column
-
 from app.core.db import Base
 
 
@@ -24,7 +23,8 @@ class Rental(Base):
     )
 
     def __init__(
-            self, start_date: date,
+            self,
+            start_date: date,
             end_date: date,
             jet_id: int,
             user_id: int
@@ -37,6 +37,13 @@ class Rental(Base):
     @hybrid_property
     def duration(self):
         return (self.end_date - self.start_date).days
+
+    @hybrid_property
+    def result(self):
+        """
+        Tests.
+        """
+        return self.duration * 3
 
     __table_args__ = (
         CheckConstraint('start_date < end_date',),

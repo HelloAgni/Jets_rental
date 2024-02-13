@@ -1,11 +1,11 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import EmailStr
 
 
 class Settings(BaseSettings):
     app_title: str = 'Empty title'
     description: str = 'Empty description'
-    database_url: str
+    database_url: str = 'postgresql+asyncpg://fapi:fapix@localhost:5432/fapi_db'
     secret: str = "SECRET"  # for User token
 
     # .env
@@ -16,17 +16,15 @@ class Settings(BaseSettings):
     birth_date: str = '1999-01-19'
 
     # bot user
-    bot_email: str = 'botman@mail.com'
-    bot_password: str = 'bot123'
-    bot_first_name: str = 'Mannn'
-    bot_last_name: str = 'Bottt'
+    bot_email: EmailStr | None = None
+    bot_password: str | None = None
+    bot_first_name: str = 'Mano'
+    bot_last_name: str = 'Boto'
     bot_birth_date: str = '2000-01-01'
 
-    class Config:
-        env_file = '.env'
+    model_config = SettingsConfigDict(env_file='.env', extra='allow')
 
 
 settings = Settings()  # type: ignore
-# print(settings.model_dump())
-# {'app_title': 'Jets Rental', 'description': 'Fictional service',
-# 'database_url': 'sqlite+aiosqlite:///./fastapijetz.db'...}
+# print('Settings ENV:', settings.model_dump())
+# {'app_title': 'Jets Rental'...}

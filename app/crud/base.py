@@ -51,7 +51,13 @@ class CRUDBase:
         session: AsyncSession,
         user: User | None = None,
     ):
+        obj_in
+        # print('BASE CRUD 1:', obj_in)
+        # BASE CRUD 1: start_date=datetime.date(2024, 1, 21) end_date=datetime.date(2024, 1, 22) jet_id=14
+        
         obj_in_data = obj_in.dict()
+        # print('BASE CRUD 2:', obj_in_data)
+        # BASE CRUD: {'start_date': datetime.date(2024, 1, 21), 'end_date': datetime.date(2024, 1, 22), 'jet_id': 13}
         if user:
             obj_in_data['user_id'] = user.id
         db_obj = self.model(**obj_in_data)

@@ -1,6 +1,5 @@
 from datetime import date, timedelta
-
-from pydantic import BaseModel, ConfigDict, Field, root_validator, validator
+from pydantic import BaseModel, ConfigDict, Field, root_validator, validator, EmailStr
 
 START_DATE = date.today() + timedelta(days=1)
 END_DATE = date.today() + timedelta(days=2)
@@ -64,9 +63,47 @@ class RentalDB(RentalBase):
     jet_id: int
     user_id: int | None
     duration: int  # Rental model @hybrid_property
+    # result: int | None = None
 
-    # By default only dict and json can serialize.
     # ORM obj to Shema
     # class Config:
     # orm_mode = True  # old version
     # from_attributes = True
+
+
+class RentalLoad(RentalCreate):
+    """
+    Tests.
+    """
+    user_id: int
+    model_config = ConfigDict(extra='allow')
+
+
+class R2(BaseModel):
+    Rental: RentalDB
+    name: str
+    price: int
+    duration: int
+    total_price: int
+
+
+class R1(BaseModel):
+    rental_id: int
+    start_date: date
+    end_date: date
+    jet_id: int
+    jet_name: str
+    price: int
+    duration: int
+    total_price: int
+
+    # Additional attrs
+    # model_config = ConfigDict(extra='allow')
+
+    # Obj -> to dict
+    # model_config = ConfigDict(from_attributes=True)
+
+
+class R3(R1):
+    user_id: int
+    user_email: EmailStr
