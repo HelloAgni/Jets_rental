@@ -24,5 +24,6 @@ pip install -r dev-requirements.txt
 cd infra/
 sudo docker compose -f docker-compose-v2.yaml up -d
 
+http://localhost:8000/docs/
 ```
-<img src="https://github.com/HelloAgni/Jets_rental/tree/main/jet_img/jet-1.png" alt="img" width="1200" height='250'>
+<img src="https://github.com/HelloAgni/Jets_rental/blob/main/jet_img/jet-1.png" width="1100" height="180">
