@@ -35,15 +35,15 @@ async def get_single(
 )
 async def get_all_jets(
     session: AsyncSession = Depends(get_async_session),
-    skip: int = Query(ge=0, example=0),
-    page_size: int = Query(ge=1, le=20, example=20)
+    start_from: int = Query(ge=0, default=0),
+    page_size: int = Query(ge=1, le=20, default=5)
 ):
     """
     Get all Jets objects.
     With pagination.
     """
     jets = await jet_crud.get_multi(session)
-    return jets[skip: page_size]
+    return jets[start_from: page_size]
 
 
 @router.post(

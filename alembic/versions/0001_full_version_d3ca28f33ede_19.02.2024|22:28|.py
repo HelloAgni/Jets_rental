@@ -1,8 +1,8 @@
-"""User Jet Rental
+"""0001-full-version
 
-Revision ID: cdbbdd6b379b
+Revision ID: d3ca28f33ede
 Revises: 
-Create Date: 2024-01-14 15:37:11.057192
+Create Date: 2024-02-19 22:28:11.221757
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'cdbbdd6b379b'
+revision: str = 'd3ca28f33ede'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
