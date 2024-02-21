@@ -1,0 +1,4 @@
+id,name,jet_type,description,speed,flight_range,passenger_capacity,price
+1,Star,big,Big superjet,800,12000,25,5000
+2,Sunny,small,Small superjet,950,9000,10,3500
+3,Moon,fast,Fast superjet,1050,8000,15,5500

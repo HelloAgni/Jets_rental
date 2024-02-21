@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-# from fastapi.responses import RedirectResponse
 from app.core.config import settings
 from app.api.routers import main_router
 from app.data._data_ import router as data_router

@@ -8,7 +8,7 @@ services:
   db:
     container_name: postgres_db_my
     image: postgres:latest
-    # restart: always
+    restart: always
     volumes:
       - db_value:/var/lib/postgresql/data/
     env_file:
@@ -17,7 +17,6 @@ services:
     #   POSTGRES_USER=fapi
     #   POSTGRES_PASSWORD=fapix
     #   POSTGRES_DB=fapi_db
-
     # environment: # or .env file to load params
     #   POSTGRES_USER=${POSTGRES_USER}
     #   POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -29,7 +28,7 @@ services:
   web:
     build:
       context: ../
-    # restart: always
+    restart: always
     depends_on:
       - db
     env_file:
@@ -47,4 +46,6 @@ volumes:
   db_value:
   web_value:
 
+# from other folder...
+# sudo docker compose -f infra/docker-compose-v2.yaml up -d
 # DATABASE_URL=postgresql+asyncpg://fapi:fapix@db:5432/fapi_db

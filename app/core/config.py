@@ -5,10 +5,13 @@ from pydantic import EmailStr
 class Settings(BaseSettings):
     app_title: str = 'Empty title'
     description: str = 'Empty description'
+
     # Postgres
-    database_url: str = 'postgresql+asyncpg://fapi:fapix@localhost:5432/fapi_db'
+    database_url: str = 'postgresql+asyncpg://fapi:fapix@localhost:5432/fapi_loc_db'
+
     # Docker compose
     # database_url: str = 'postgresql+asyncpg://fapi:fapix@db:5432/fapi_db'
+
     # SQLite
     # database_url: str = DATABASE_URL=sqlite+aiosqlite:///./fastapijetz.db
     secret: str = "SECRET"  # for User token

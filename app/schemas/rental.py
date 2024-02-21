@@ -1,5 +1,7 @@
 from datetime import date, timedelta
-from pydantic import BaseModel, ConfigDict, Field, root_validator, validator, EmailStr
+
+from pydantic import (BaseModel, ConfigDict, EmailStr, Field, root_validator,
+                      validator)
 
 START_DATE = date.today() + timedelta(days=1)
 END_DATE = date.today() + timedelta(days=2)
@@ -29,7 +31,7 @@ class RentalUpdate(RentalBase):
         # print('Rental Schema1', value)
         #  2024-01-15
         if value <= date.today():
-            raise ValueError(f'You cant rent from {value}\n'
+            raise ValueError(f'You cant rent from {value} '
                              f'Today is {date.today()}')
         return value
 
@@ -67,27 +69,24 @@ class RentalDB(RentalBase):
 
     # ORM obj to Shema
     # class Config:
-    # orm_mode = True  # old version
-    # from_attributes = True
+    #    # orm_mode = True  # old version
+
+    # New
+    # model_config = ConfigDict(from_attributes=True)
 
 
 class RentalLoad(RentalCreate):
     """
-    Tests.
+    Schema convert Date format for Postgres.
     """
     user_id: int
     model_config = ConfigDict(extra='allow')
 
 
-class R2(BaseModel):
-    Rental: RentalDB
-    name: str
-    price: int
-    duration: int
-    total_price: int
-
-
 class R1(BaseModel):
+    """
+    Rental Response schema v1.
+    """
     rental_id: int
     start_date: date
     end_date: date
@@ -104,6 +103,20 @@ class R1(BaseModel):
     # model_config = ConfigDict(from_attributes=True)
 
 
+class R2(BaseModel):
+    """
+    Rental Response schema v2.
+    """
+    Rental: RentalDB
+    name: str
+    price: int
+    duration: int
+    total_price: int
+
+
 class R3(R1):
+    """
+    Rental Response schema v3.
+    """
     user_id: int
     user_email: EmailStr

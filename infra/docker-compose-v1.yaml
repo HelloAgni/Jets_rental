@@ -1,4 +1,4 @@
-# sudo docker compose -f docker-compose-v1.yaml up -d
+# sudo docker compose -f infra/docker-compose-v1.yaml up -d
 version: '3.8'
 
 services:
@@ -6,20 +6,11 @@ services:
   db:
     container_name: postgres_db_my
     image: postgres:latest
-    # restart: always
+    restart: always
     volumes:
       - db_value:/var/lib/postgresql/data/
     env_file:
-       - .env.example
-    # environment: # or .env file to load params
-    #   POSTGRES_USER: fapi
-    #   POSTGRES_PASSWORD: fapix
-    #   POSTGRES_DB: fapi_db
-
-    # environment: # or .env file to load params
-    #   POSTGRES_USER: ${POSTGRES_USER}
-    #   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    #   POSTGRES_DB: ${POSTGRES_DB}
+       - .env.local
     ports:
       # - "49150:5432"  # Iternal for PgAdmin
       - "5432:5432"    # work on local connect for DBeaver!
@@ -28,8 +19,7 @@ volumes:
   db_value:
 
 
-# sudo docker compose up -d
-# cd to alembic.ini
+# sudo docker compose -f infra/docker-compose-v1.yaml up -d
 # alembic upgrade head   -> create all tables
 
-# DATABASE_URL=postgresql+asyncpg://fapi:fapix@localhost:5432/fapi_db
+# DATABASE_URL=postgresql+asyncpg://fapi:fapix@localhost:5432/fapi_loc_db
