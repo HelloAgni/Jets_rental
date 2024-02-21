@@ -44,10 +44,11 @@ http://127.0.0.1:8000/docs
 - **[Insert Test Data](http://127.0.0.1:8000/docs#/Load_data/insert_data_jet_rental_insert_data_jet_rental_post)**  
 - **[Check Test Data](http://127.0.0.1:8000/docs#/Load_data/check_data_check_data_get)**
 
-**Authorize**  
+**Authorize test user:**
+```
 Username: super@mail.com  
 Password: super  
-
+```
 ---
 
 ***Dev local run with Postgres.***
@@ -82,7 +83,8 @@ http://127.0.0.1:8000/docs
 - **[Insert Test Data](http://127.0.0.1:8000/docs#/Load_data/insert_data_jet_rental_insert_data_jet_rental_post)**  
 - **[Check Test Data](http://127.0.0.1:8000/docs#/Load_data/check_data_check_data_get)**
 
-**Authorize**  
+**Authorize test user:**
+```
 Username: super@mail.com  
-Password: super 
-
+Password: super  
+```
