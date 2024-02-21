@@ -18,11 +18,13 @@
 </div>  
 
 ### Api for superjet rental service.
-The application allows you to rent  superjet for a specific date, the minimum rental duration is one day.  
-- It is possible to register users.
-- Create and modify superjet objects according to the specified parameters.
-- Book a rental for a specified date.
-- Upload data from csv.
+The application allows you to rent a superjet for a specific date and calculate the rental cost.
+- It is possible to register users, verify, simulate fake email.
+- Create, update superjet objects according to the specified parameters.
+- Rental for a specified date, the minimum rental duration is one day.
+- Calculation of rental cost based on duration.
+- Upload data from csv and create csv with any quantity rows.
+- Checking data with pagination.
 
 Data for preview and documentation available.  
 
